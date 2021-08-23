@@ -24,10 +24,6 @@ data.corr(method = 'pearson')
 
 
 
-
-
-
-
 gold = yf.Ticker("GC=F")#gold future december 21
 # get stock info
 usdeur = yf.Ticker("USDEUR=X")
