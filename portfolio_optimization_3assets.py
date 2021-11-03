@@ -7,17 +7,17 @@ import matplotlib.pyplot as plt
 
 yf.pdr_override() # <== that's all it takes :-)
 # download dataframe
-adap_db = pdr.get_data_yahoo("ADAP", start="2020-01-01", end="2021-08-23")['Adj Close']
-gold_db = pdr.get_data_yahoo("GC=F", start="2020-01-01", end="2021-08-23")['Adj Close']
-commodity = pdr.get_data_yahoo("DJCI", start="2020-01-01", end="2021-08-23")['Adj Close']
+adap_db = pdr.get_data_yahoo("USDEUR=X", start="2020-01-01", end="2021-11-02")['Adj Close']
+gold_db = pdr.get_data_yahoo("3GOL.MI", start="2020-01-01", end="2021-11-02")['Adj Close'] #ETF x3 in Milan stock exchange
+commodity = pdr.get_data_yahoo("^TNX", start="2020-01-01", end="2021-11-02")['Adj Close']
 
 data = pd.DataFrame({'adap' : adap_db, 'gold' : gold_db , 'commodity' : commodity}).reset_index(drop = True).dropna()
 data_yesindex = pd.DataFrame({'adap' : adap_db, 'gold' : gold_db , 'commodity' : commodity}).dropna()
-
+data_yesindex['Date'] = data_yesindex.index
 #data.corr(method = 'pearson')
 #log-returns
 data = data[['adap','gold','commodity']].pct_change().apply(lambda x: np.log(1+x))
-data = data.drop([0])
+data = data.drop([2]) #check the first index
 data_yesindex= data_yesindex[['adap','gold','commodity']].pct_change().apply(lambda x: np.log(1+x))
 data_yesindex = data_yesindex.dropna()
 
@@ -27,6 +27,38 @@ gold_vol = np.sqrt(data['gold'].var() * 250)
 commodity_vol = np.sqrt(data['commodity'].var() * 250)
 cov_matrix = data.cov()
 corr_matrix = data.corr()
+
+
+
+import plotly.graph_objects as go
+
+# Create random data with numpy
+np.random.seed(1)
+# Create traces
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=data_yesindex.index, y=data_yesindex['adap'],
+                    mode='lines',
+                    name='lines'))
+fig.add_trace(go.Scatter(x=random_x, y=random_y1,
+                    mode='lines+markers',
+                    name='lines+markers'))
+fig.add_trace(go.Scatter(x=random_x, y=random_y2,
+                    mode='markers', name='markers'))
+
+fig.show()
+
+import plotly.express as px
+fig = px.line(data_yesindex, x='Date', y="adap")
+fig.show()
+
+
+
+import plotly.express as px
+
+df = px.data.stocks()
+fig = px.line(df, x='date', y="GOOG")
+fig.show()
+
 
 '''Note that we use the resample() function to get yearly returns. 
 The argument to function, ‘Y’, denotes yearly.'''
